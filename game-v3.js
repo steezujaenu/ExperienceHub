@@ -47,7 +47,7 @@ scenarios: {
                 width: 1200, 
                 height: 800, 
                 background: '#1a1a2e', 
-                image: 'images/mob_map2.png' 
+                image: 'mob_map2.png' 
             },
             relatedStakeholders: [],
             hotspots: [
@@ -62,7 +62,7 @@ scenarios: {
         mobility: {
             name: "Mobility",
             stakeholder: "Fläche: 12000 m2",
-            map: { width: 1200, height: 800, background: '#4a6741', image: 'images/mobility-map.png' },
+            map: { width: 1200, height: 800, background: '#4a6741', image: 'mobility-map.png' },
             relatedStakeholders: ["Site Experience Management", "REAM", "Facility Coordinators", "New Joiner SPOC", "Business Partners", "Onsite Services"],
             // hotspots: [{ x: 180, y: 150, w: 200, h: 70, label: "PARKHAUS NORD", details: "Belegung: 742 / 1000\nE-Ladestationen: 1/5" }],
             positiveObjects: [
@@ -79,7 +79,7 @@ scenarios: {
         workplace: {
             name: "Workplace",
             stakeholder: "Fläche: 1200 m2  Renoviert: 04.03.2016",
-            map: { width: 1200, height: 800, background: '#5a5a7a', image: 'images/workplace-map.png' },
+            map: { width: 1200, height: 800, background: '#5a5a7a', image: 'workplace-map.png' },
             relatedStakeholders: ["Site Experience Management", "REAM", "Facility Coordinators", "Health & Wellbeing", "Managed Spaces", "Business Partners", "Onsite Services"],
             //hotspots: [{ x: 370, y: 150, w: 200, h: 100, label: "FOKUS-ZONE B1", details: "Belegung: 18 / 24 Tische\nTemperatur: 23°\nLuftfeuchtigkeit: 40%" }],
             positiveObjects: [
@@ -96,7 +96,7 @@ scenarios: {
         tavero: {
             name: "Tavero",
             stakeholder: "Fläche: 450 m2   Renoviert: 23.08.2023",
-            map: { width: 1200, height: 800, background: '#6b4423', image: 'images/tavero-map.png' },
+            map: { width: 1200, height: 800, background: '#6b4423', image: 'tavero-map.png' },
             relatedStakeholders: ["Site Experience Management", "REAM", "Facility Coordinators", "Health & Wellbeing", "Managed Spaces", "Business Partners"],
             //hotspots: [{ x: 650, y: 680, w: 250, h: 120, label: "RESTAURANT-LIVE", details: "Verkaufte Menüs: 142 Stück\nDavon Vegi:66\nDavon Fleisch: 76" }],
             positiveObjects: [
@@ -119,7 +119,7 @@ init() {
     // Charakter-Bild laden
     this.character.image = new Image();
     this.character.image.onload = () => { this.character.isLoaded = true; };
-    this.character.image.src = 'images/Character.png'; // Pfad zu deinem PNG
+    this.character.image.src = 'Character.png'; // Pfad zu deinem PNG
 
     this.setupEventListeners();
     this.updateMetrics();
