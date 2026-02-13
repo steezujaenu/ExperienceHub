@@ -1,0 +1,13 @@
+{
+  "name": "Experience Hub",
+  "short_name": "ExpHub",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "description": "Campus Impact Simulator",
+  "icons": [{
+    "src": "images/Character.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
+}

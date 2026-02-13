@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXPERIENCE HUB - MVP</title>
+
+<link rel="manifest" href="manifest.json">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: #1a1a2e;
+            color: #eee;
+            overflow: hidden;
+        }
+
+        /* Pixel Art Font Fallback */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .game-header {
+            background: #0f3460;
+            padding: 20px;
+            border-bottom: 4px solid #16213e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            font-size: 24px;
+            color: #00d9ff;
+            text-shadow: 3px 3px 0 #005f73;
+        }
+
+        .metrics-display {
+            display: flex;
+            gap: 30px;
+            font-size: 10px;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .metric-label {
+            color: #aaa;
+        }
+
+        .metric-value {
+            font-size: 14px;
+            color: #00ff88;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Menu Screen */
+        .menu-screen {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px;
+        }
+
+        .menu-title {
+            font-size: 36px;
+            color: #00d9ff;
+            margin-bottom: 60px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .scenario-card {
+            background: #0f3460;
+            border: 4px solid #16213e;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d9ff;
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .scenario-card.active {
+            border-color: #00ff88;
+        }
+
+        .scenario-card.inactive {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #0a1f3d;
+        }
+
+        .scenario-card.inactive:hover {
+            transform: none;
+            border-color: #16213e;
+            box-shadow: none;
+        }
+
+        .scenario-name {
+            font-size: 18px;
+            color: #00d9ff;
+            margin-bottom: 15px;
+        }
+
+        .scenario-stakeholder {
+            font-size: 10px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .scenario-description {
+            font-size: 8px;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .info-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 10px;
+            font-size: 8px;
+            border-radius: 3px;
+        }
+
+        /* Game Screen */
+        .game-screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        .game-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+/* Modernisierung des Headers */
+.game-header {
+    background: rgba(15, 52, 96, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+}
+
+/* Der Live-Cockpit Button als Highlight */
+.nav-item[onclick*="overview"] {
+    border-radius: 4px;
+    background: rgba(0, 217, 255, 0.1) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Styling für das Chat-Icon */
+.chat-icon {
+    background: rgba(0, 255, 136, 0.2);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid #00ff88;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    margin-left: 25px !important;
+}
+
+/* Metriken in "Boxen" für HUD-Look */
+.metric {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 217, 255, 0.2);
+}
+
+/* Live-Daten Modal Styling */
+#liveDataModal .modal-content {
+    border: 4px solid #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    background: #0f3460;
+    max-width: 500px;
+}
+
+#liveDataBody {
+    font-family: sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #eee;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 25px;
+}
+
+/* --- Interaktions-Elemente --- */
+
+/* Erlaubt den Wechsel zum Zeigefinger bei Hotspots */
+.hover-hotspot {
+    cursor: pointer !important;
+}
+
+/* Spezifisches Styling für das Live-Daten-Fenster */
+#liveDataModal .modal-content {
+    border: 4px solid #00ff88 !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+/* --- Layout-Bereiche --- */
+
+.canvas-area {
+    flex: 1;
+    background: #2a2a4e;
+    position: relative;
+    overflow: auto;
+    /* Zentriert das Canvas-Element */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameCanvas {
+    display: block;
+    cursor: crosshair;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* --- Sidebar & Objekte --- */
+
+.sidebar {
+    width: 350px;
+    background: #16213e;
+    border-left: 4px solid #0f3460;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar-section {
+    padding: 20px;
+    border-bottom: 2px solid #0f3460;
+}
+
+.section-title {
+    font-size: 12px;
+    color: #00d9ff;
+    margin-bottom: 15px;
+}
+
+.objects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.object-item {
+    background: #0f3460;
+    border: 3px solid #1a1a2e;
+    padding: 15px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.object-item:hover {
+    border-color: #00d9ff;
+    transform: scale(1.05);
+}
+
+.object-item.selected {
+    border-color: #00ff88;
+    background: #1a3a5a;
+}
+
+.object-item.positive {
+    border-left: 4px solid #00ff88;
+}
+
+.object-item.negative {
+    border-left: 4px solid #ff6b6b;
+}
+
+.object-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.object-name {
+    font-size: 8px;
+    color: #eee;
+    margin-bottom: 5px;
+}
+
+.object-impact {
+    font-size: 6px;
+    color: #aaa;
+}
+
+        /* Nudge System */
+        .nudge-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 217, 255, 0.95);
+            color: #1a1a2e;
+            padding: 25px 40px;
+            border-radius: 5px;
+	    border: 3px solid #1a1a2e;
+            font-size: 14px;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.5);
+            animation: slideUp 0.5s ease-out;
+            display: none;
+            z-index: 999;
+        }
+
+        .nudge-container.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0f3460;
+            border: 4px solid #00d9ff;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            color: #00d9ff;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            font-size: 10px;
+            color: #eee;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .stakeholder-list {
+            background: #1a1a2e;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 8px;
+            line-height: 2;
+        }
+
+.stakeholder-list {
+            background: #1a1a2e;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+            border: 2px solid #16213e;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .stakeholder-checkbox {
+            cursor: pointer;
+            accent-color: #00ff88;
+            transform: scale(1.2);
+        }
+
+        #warningText {
+            display: block;
+            min-height: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #00d9ff;
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #00ff88;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: #eee;
+        }
+
+        .btn-secondary:hover {
+            background: #777;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: #0f3460;
+            padding: 15px 20px;
+            border-top: 4px solid #16213e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-info {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px;
+        }
+
+        .results-screen.show {
+            display: flex;
+        }
+
+        .results-title {
+            font-size: 32px;
+            color: #00ff88;
+            margin-bottom: 50px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 50px;
+        }
+
+        .result-card {
+            background: #0f3460;
+            border: 4px solid #16213e;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 10px;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .result-value {
+            font-size: 36px;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .result-change {
+            font-size: 12px;
+            color: #00d9ff;
+        }
+
+        .collaboration-bonus {
+            background: rgba(0, 255, 136, 0.1);
+            border: 3px solid #00ff88;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 10px;
+            color: #00ff88;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                max-height: 300px;
+            }
+
+            .game-area {
+                flex-direction: column;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+<div class="game-header">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div class="game-title">EXPERIENCE HUB</div>
+                
+                <div class="header-nav" style="display: flex; align-items: center; gap: 15px;">
+                    <div class="nav-item" 
+                         onclick="game.startScenario('overview')" 
+                         style="cursor: pointer; display: flex; align-items: center; justify-content: center; height: 35px; min-width: 140px; padding: 0 15px; border: 1px solid #00d9ff; font-size: 10px; color: #00d9ff; transition: all 0.3s; background: rgba(0,217,255,0.1); border-radius: 4px;"
+                         onmouseover="this.style.background='rgba(0,217,255,0.3)'; this.style.boxShadow='0 0 10px #00d9ff'" 
+                         onmouseout="this.style.background='rgba(0,217,255,0.1)'; this.style.boxShadow='none'">
+                         LIVE COCKPIT
+                    </div>
+                    
+                    <div class="nav-item active" style="display: flex; align-items: center; height: 35px; padding-top: 2px;">
+                        LAUFENDE PROJEKTE
+                    </div>
+
+                    <div class="nav-item chat-icon" 
+                         style="cursor: help; display: flex; align-items: center; justify-content: center; width: 35px; height: 35px; background: rgba(0, 255, 136, 0.2); border-radius: 50%; border: 2px solid #00ff88; font-size: 18px; transition: all 0.3s; opacity: 0.8;"
+                         title="Campus Data Assistant (Coming Soon)"
+                         onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 0 15px #00ff88'" 
+                         onmouseout="this.style.opacity='0.8'; this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                         💬
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-display">
+                <div class="metric">
+                    <div class="metric-label">ZUFRIEDENHEIT</div>
+                    <div class="metric-value"><span id="satisfactionScore">6.5</span>/10</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">PRODUKTIVITÄT</div>
+                    <div class="metric-value"><span id="productivityScore">7.0</span>/10</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">FLUKTUATION</div>
+                    <div class="metric-value" id="fluctuationScore">12.5%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">NETTO GEWINN</div>
+                    <div class="metric-value" id="revenueScore">0 CHF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Screen -->
+        <div class="menu-screen" id="menuScreen">
+            <div class="menu-title">WÄHLE DEIN SZENARIO</div>
+            <div class="scenario-grid">
+                <!-- Spielbare Szenarien -->
+                <div class="scenario-card active" data-scenario="mobility">
+                    <div class="scenario-name">🚌 MOBILITY</div>
+                    <div class="scenario-stakeholder">Stakeholder: Mobility Manager</div>
+                    <div class="scenario-description">
+                        Optimiere die Infrastruktur und Erreichbarkeit des Roche Campus Basel.
+                        Platziere Busse, Fahrradstationen und mehr.
+                    </div>
+                </div>
+
+                <div class="scenario-card active" data-scenario="workplace">
+                    <div class="scenario-name">🏢 WORKPLACE</div>
+                    <div class="scenario-stakeholder">Stakeholder: Workplace Lead</div>
+                    <div class="scenario-description">
+                        Gestalte den perfekten Arbeitsplatz. Von Ergonomie bis Akustik – 
+                        schaffe eine produktive Umgebung.
+                    </div>
+                </div>
+
+                <div class="scenario-card active" data-scenario="tavero">
+                    <div class="scenario-name">🍽️ TAVERO</div>
+                    <div class="scenario-stakeholder">Stakeholder: Gastro-Chef</div>
+                    <div class="scenario-description">
+                        Kreiere das ideale Gastro-Erlebnis. Reduziere Wartezeiten und 
+                        steigere die Zufriedenheit.
+                    </div>
+                </div>
+
+                <!-- Informations-Stakeholder -->
+                <div class="scenario-card inactive">
+                    <div class="info-badge">INFO</div>
+                    <div class="scenario-name">👥 BUSINESS PARTNERS</div>
+                    <div class="scenario-stakeholder">Teil des Ökosystems</div>
+                    <div class="scenario-description">
+                        Wichtiger Stakeholder im Campus-Ökosystem. Wird bei Kollaboration einbezogen.
+                    </div>
+                </div>
+
+                <div class="scenario-card inactive">
+                    <div class="info-badge">INFO</div>
+                    <div class="scenario-name">🏥 HEALTH & WELLBEING</div>
+                    <div class="scenario-stakeholder">Teil des Ökosystems</div>
+                    <div class="scenario-description">
+                        Fokus auf Mitarbeitergesundheit. Wird bei Kollaboration einbezogen.
+                    </div>
+                </div>
+
+                <div class="scenario-card inactive">
+                    <div class="info-badge">INFO</div>
+                    <div class="scenario-name">🏗️ REAM</div>
+                    <div class="scenario-stakeholder">Teil des Ökosystems</div>
+                    <div class="scenario-description">
+                        Real Estate Asset Management. Wird bei Kollaboration einbezogen.
+                    </div>
+                </div>
+
+                <!-- NEUE STAKEHOLDER-KARTEN -->
+                <div class="scenario-card inactive">
+                    <div class="info-badge">INFO</div>
+                    <div class="scenario-name">🎯 NEW JOINER SPOC</div>
+                    <div class="scenario-stakeholder">Teil des Ökosystems</div>
+                    <div class="scenario-description">
+                        Fokus auf Onboarding Experience. Erste Eindrücke prägen langfristige Zufriedenheit.
+                    </div>
+                </div>
+
+                <div class="scenario-card inactive">
+                    <div class="info-badge">INFO</div>
+                    <div class="scenario-name">🔧 FACILITY COORDINATORS</div>
+                    <div class="scenario-stakeholder">Teil des Ökosystems</div>
+                    <div class="scenario-description">
+                        Fokus auf operative Exzellenz. Schnelle Reaktion auf Campus-Bedürfnisse.
+                    </div>
+                </div>
+
+                <div class="scenario-card inactive">
+                    <div class="info-badge">INFO</div>
+                    <div class="scenario-name">🛎️ ONSITE SERVICES</div>
+                    <div class="scenario-stakeholder">Teil des Ökosystems</div>
+                    <div class="scenario-description">
+                        Fokus auf Campus Convenience. Vom Concierge bis zum Tech-Support.
+                    </div>
+                </div>
+
+                <div class="scenario-card inactive">
+                    <div class="info-badge">INFO</div>
+                    <div class="scenario-name">📊 MANAGED SPACES</div>
+                    <div class="scenario-stakeholder">Teil des Ökosystems</div>
+                    <div class="scenario-description">
+                        Fokus auf Raumnutzung. Optimale Auslastung durch datenbasierte Planung.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <div class="game-area">
+                <div class="canvas-area">
+                    <canvas id="gameCanvas"></canvas>
+                </div>
+
+                <div class="sidebar">
+                    <div class="sidebar-section">
+                        <div class="section-title">POSITIVE ELEMENTE</div>
+                        <div class="objects-grid" id="positiveObjects"></div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <div class="section-title">NEGATIVE ELEMENTE</div>
+                        <div class="objects-grid" id="negativeObjects"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <div class="action-info" id="actionInfo">Wähle ein Element und platziere es auf der Karte</div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="game.backToMenu()">ZURÜCK</button>
+                    <button class="btn" onclick="game.confirmPlanning()">SIMULATION STARTEN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-title">SIMULATION ABGESCHLOSSEN</div>
+            
+            <div class="collaboration-bonus" id="collaborationBonus" style="display: none;">
+                ✨ KOLLABORATIONS-BONUS AKTIVIERT! ✨
+                <br>Alle Werte um 15% erhöht durch erfolgreiche Stakeholder-Integration
+            </div>
+
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-label">ZUFRIEDENHEIT</div>
+                    <div class="result-value" id="finalSatisfaction">0</div>
+                    <div class="result-change" id="satisfactionChange">+0</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-label">PRODUKTIVITÄT</div>
+                    <div class="result-value" id="finalProductivity">0</div>
+                    <div class="result-change" id="productivityChange">+0</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-label">FLUKTUATION</div>
+                    <div class="result-value" id="finalFluctuation">0%</div>
+                    <div class="result-change" id="fluctuationChange">-0%</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-label">ZUSÄTZLICHER UMSATZ</div>
+                    <div class="result-value" id="finalRevenue">0</div>
+                    <div class="result-change">CHF pro Jahr</div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="game.backToMenu()">NEUES SPIEL</button>
+        </div>
+    </div>
+
+    <!-- Nudge Container -->
+<div class="nudge-container" id="nudgeContainer"></div>
+
+    <div class="modal" id="stakeholderModal">
+        <div class="modal-content">
+            <div class="modal-title">STAKEHOLDER-KOLLABORATION</div>
+            <div class="modal-text">
+                Von welchen Stakeholdern sollen Daten angefordert werden?
+            </div>
+            <div class="stakeholder-list" id="stakeholderList"></div>
+            <p id="warningText" style="color: #ff6b6b; font-size: 8px; margin-bottom: 10px;"></p>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="game.stakeholderCheckResponse(false)">NEIN, PILOT</button>
+                <button class="btn" onclick="game.stakeholderCheckResponse(true)">JA, ANFRAGEN</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="liveDataModal">
+        <div class="modal-content" style="border-color: #00ff88;">
+            <div class="modal-title" id="liveDataTitle" style="color: #00ff88;">LIVE CAMPUS DATEN</div>
+            <div id="liveDataBody" style="font-size: 12px; color: #eee; margin-bottom: 30px; line-height: 1.6; text-align: left; background: rgba(0,0,0,0.3); padding: 20px;">
+                </div>
+            <button class="btn" onclick="document.getElementById('liveDataModal').classList.remove('show')">SCHLIESSEN</button>
+        </div>
+    </div>
+
+    <script src="game-v3.js"></script>
+</body>
+</html>
